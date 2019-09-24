@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="style(1).css" rel="stylesheet">
+
+    <title>Currency Converter</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="col-4"></div>
+      <div class="col-4">
+        <h1>Currency Converter</h1>
+
+        <label>From</label>
+        <select class="form-control form-control-sm" id="selectfrom">
+          <option>---</option>
+          <option>JPY</option>
+          <option>PHP</option>
+          <option>USD</option>
+          <option>EUR</option>
+          <option>AUD</option>
+        </select>
+
+        <label>To</label>
+        <select class="form-control form-control-sm" id="selectto">
+          <option>---</option>
+          <option>JPY</option>
+          <option>PHP</option>
+          <option>USD</option>
+          <option>EUR</option>
+          <option>AUD</option>
+        </select>
+
+        <div>Amount<br>
+          <input type="text" id="amount">
+          <button onclick="changeBase();">Convert</button>
+        </div>
+        <br>
+
+        <h4 id="res">RESULT:&nbsp;<h4 id="result"></h4></h4>
+      </div>
+      <div class="col-4"></div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script>
+  var base = '';
+  var target = '';
+  var html = '';
+  var amount;
+  var database;
+
+
+  function changeBase(country) {
+    base = $('#selectfrom').val(); 
+    target = $('#selectto').val();
+    amount = $('#amount').val();
+    getData();
+  } 
+
+// APIのデータを取り出す。
+  function getData(){
+  $.ajax({
+    url: "https://api.exchangeratesapi.io/latest?base="+base,
+    success: function(data) {
+      console.log(data);
+      database = Object.keys(data).map(function(key) {
+        return data[key];
+        // dataはAPIデータを取り出す引数、Object.keys()メソッドでオブジェクト内のプロパティを配列として取得、map関数で必要なプロパティを取り出し新たな配列を作成。
+        // map関数例ーーーーーーーーーーーーーーーーーーーーーー
+        // var items = [1,2,3,4,5]; 
+        // var result = items.map(function( value ) {
+        // return value * 2;
+        // });
+        // console.log( result );
+        // →[2, 4, 6, 8, 10]
+        // ーーーーーーーーーーーーーーーーーーーーーーmap関数例
+        // 71行目でAPIデータの値(key)の部分を取り出した状態
+      })
+      console.log(database);
+      fetchRates();
+    },
+  });
+  }
+
+  function fetchRates() {
+    var pickdata = Object.keys(database[0]).map(function(countryrate) {
+      // pickdataでdatabaseの[0]番目の配列(＝{rates})から新たな配列(各通貨の配列)を作成
+        return [countryrate,database[0][countryrate]];//=key:valueの配列
+        //database[0][countryrate]=database0番目の配列(=rates)の情報を配列として取り出す=例[JPY,1]...
+      });
+    // console.log(pickdata);
+    for(i=0 ; i<pickdata.length; i++) {
+      var rates = pickdata[i][1];
+      // console.log(rates);
+      var countryrate = pickdata[i][0];
+      // console.log(countryrate);
+      if (target == countryrate){
+        html += countryrate + '&nbsp;' +parseFloat(rates)*parseFloat(amount)+'<br>';
+    // もしtargetとcountryrateが等しければ、htmlを以下に書き換える。countryrateを表示。parseFloatでratesを文字列から数値に変換し、toFixedで小数点以下の表示を4桁表示に指定させた上で、parseFloatで文字列から数値に変換させたamountを掛ける。
+      }
+    }
+    document.getElementById('result').innerHTML = html;
+  }
+
+   
+  
+
+
+
+</script>
+  </body>
+</html>

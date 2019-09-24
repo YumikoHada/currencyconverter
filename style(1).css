@@ -1,0 +1,12 @@
+.form-control {
+	width: 200px;
+}
+#res {
+	float: left;
+}
+body {
+	background-image: url("backgroundimg.jpg");
+}
+button {
+	color: #000000;
+}
